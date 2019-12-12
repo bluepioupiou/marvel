@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import md5 from 'js-md5'
 
+import { Link } from 'react-router-dom'
+
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import CircularProgress from '@material-ui/core/CircularProgress';
+
 
 const publicKey = '6234015b1ce8dbc11cb2274c83e2b286'
 const privateKey = 'dcd246109083f1b316b680b80c3e3004a9b66524'
@@ -42,9 +45,11 @@ export default () => {
                   <img src={character.thumbnail.path + '.' + character.thumbnail.extension} alt={character.name} style={{height: 'inherit'}}></img>
                 </Avatar>
               </ListItemAvatar>
-              <ListItemText
-                primary={character.name}
-              />
+              <Link to={'/characters/' + character.id}>
+                <ListItemText
+                  primary={character.name}
+                />
+              </Link>              
             </ListItem>
           ))}
         </List>)
