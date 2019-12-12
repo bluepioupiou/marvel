@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom'
-import md5 from 'js-md5'
+
+import useFetchMarvel from '../hooks/useFetchMarvel'
 
 import { Link } from 'react-router-dom'
 
@@ -18,9 +19,6 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 
-const publicKey = '6234015b1ce8dbc11cb2274c83e2b286'
-const privateKey = 'dcd246109083f1b316b680b80c3e3004a9b66524'
-
 const useStyles = makeStyles({
   card: {
     maxWidth: 345,
@@ -37,22 +35,12 @@ const useStyles = makeStyles({
 
 export default function CharacterCard () {
   const classes = useStyles()
-  const [character, setCharacter] = useState()
-  const [loading, setLoading] = useState(true)
   const { id } = useParams()
-
-  useEffect(() => {
-    async function fetchData() {
-      const ts = Date.now()
-      const hash = md5(ts + privateKey + publicKey) 
-      const response = await fetch('http://gateway.marvel.com/v1/public/characters/' + id + '?ts=' + ts + '&apikey=' + publicKey + '&hash='+hash)
-      const result = await response.json()
-      setCharacter(result.data.results[0])
-      setLoading(false)
-    }
-    setLoading(true)
-    fetchData()
-  }, [id])
+  const [ characters, loading ] =  useFetchMarvel('characters/' + id + '?')
+  let character
+  if (!loading) {
+    character = characters[0]
+  }
   
   return (
     <>
@@ -80,16 +68,16 @@ export default function CharacterCard () {
               
             </Typography>
             <Divider  variant="middle" className={classes.divider}/>
-            <Typography variant="body2" color="textSecondary" component="p">
+            <div>
               available in {character.comics.available} comics such as
-            <List>
-              {character.comics.items.splice(0,3).map(comic => (
-                <ListItem  key={comic.resourceURI}>
-                  <ListItemText primary={comic.name} />
-                </ListItem>
-              ))}
-            </List>
-            </Typography>
+              <List>
+                {character.comics.items.splice(0,3).map(comic => (
+                  <ListItem  key={comic.resourceURI}>
+                    <ListItemText primary={comic.name} />
+                  </ListItem>
+                ))}
+              </List>
+            </div>
           </CardContent>
           
         </Card>
